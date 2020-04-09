@@ -1,5 +1,6 @@
 package dijkstra
 
+import "sync"
 func node(retc chan []string, endName string, name string) chan robot {
 	inputc := make(chan robot, 100)
 	go func() {
@@ -20,6 +21,23 @@ func node(retc chan []string, endName string, name string) chan robot {
 		}
 	}
 	retc <- path
+
+	} ()
+	return inputc
+}
+
+func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodec chan robot) chan robot {
+	inputc := make(chan robot)
+	go func() {
+
+	wg.Add(1)
+	defer wg.Done()
+
+	_, ok := dests[name]
+	if !ok {
+		input := <-inputc
+		nodec <- input
+	}
 
 	} ()
 	return inputc

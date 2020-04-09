@@ -6,7 +6,6 @@ type robot struct {
 }
 
 type dest struct {
-	source string
 	dest string
 	pathLength float64
 }
