@@ -31,7 +31,6 @@ func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodePool
 	go func() {
 	nodec := nodePool[name]
 
-	wg.Add(1)
 	defer wg.Done()
 
 	destinations, ok := dests[name]
@@ -43,6 +42,7 @@ func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodePool
 		links := make([]link, 0)
 		delete(dests, name)
 		for x := 0 ; x < len(destinations) ; x++ {
+			wg.Add(1)
 			destc := treeNode(dests, wg, destinations[x].dest, nodePool)
 			links = append(links, link{dest:destc, pathLength:destinations[x].pathLength})
 		}

@@ -24,6 +24,7 @@ func TestTreeNode(t *testing.T) {
 	dests := make( map[string][]dest )
 	nodePool := make(map[string]chan robot)
 	var wg sync.WaitGroup
+	wg.Add(1)
 	nodePool["e"] = make(chan robot)
 
 	inputc := treeNode(dests, &wg, "e", nodePool)
@@ -37,6 +38,7 @@ func TestTreeNode(t *testing.T) {
 	}
 
 	var wg2 sync.WaitGroup
+	wg2.Add(1)
 	dests["a"]=[]dest{dest{dest:"e", pathLength:1}}
 	nodePool["e"] = make(chan robot)
 	inputc = treeNode(dests, &wg2, "a", nodePool)
