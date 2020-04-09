@@ -21,17 +21,33 @@ func TestNode(t *testing.T) {
 }
 
 func TestTreeNode(t *testing.T) {
-	var dests map[string][]dest
+	dests := make( map[string][]dest )
+	nodePool := make(map[string]chan robot)
 	var wg sync.WaitGroup
-	nodec := make(chan robot)
+	nodePool["e"] = make(chan robot)
 
-	inputc := treeNode(dests, &wg, "e", nodec)
+	inputc := treeNode(dests, &wg, "e", nodePool)
 	go func() {
 		defer close(inputc)
 		inputc <- robot{path:[]string{"s"}, pathLength:1}
 	} ()
-	node := <-nodec
+	node := <-nodePool["e"]
 	if node.path[0] != "s" {
 		t.Errorf("Error: treeNode did not return proper path in first test.")
+	}
+
+	var wg2 sync.WaitGroup
+	dests["a"]=[]dest{dest{dest:"e", pathLength:1}}
+	nodePool["e"] = make(chan robot)
+	inputc = treeNode(dests, &wg2, "a", nodePool)
+
+	go func() {
+		defer close(inputc)
+		inputc <- robot{path:[]string{"s"}, pathLength:1}
+	} ()
+
+	node = <-nodePool["e"]
+	if node.path[2] != "e" {
+		t.Errorf("Error: treeNode did not launch subTree.")
 	}
 }

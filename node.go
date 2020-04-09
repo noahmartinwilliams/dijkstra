@@ -26,17 +26,34 @@ func node(retc chan []string, endName string, name string) chan robot {
 	return inputc
 }
 
-func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodec chan robot) chan robot {
+func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodePool map[string]chan robot) chan robot {
 	inputc := make(chan robot)
 	go func() {
+	nodec := nodePool[name]
 
 	wg.Add(1)
 	defer wg.Done()
 
-	_, ok := dests[name]
+	destinations, ok := dests[name]
 	if !ok {
 		input := <-inputc
+		input.path = append(input.path, name)
 		nodec <- input
+	} else {
+		links := make([]link, 0)
+		delete(dests, name)
+		for x := 0 ; x < len(destinations) ; x++ {
+			destc := treeNode(dests, wg, destinations[x].dest, nodePool)
+			links = append(links, link{dest:destc, pathLength:destinations[x].pathLength})
+		}
+		input := <-inputc
+		go func() {
+			nodec <- input
+		} ()
+		input.path = append(input.path, name)
+		for x := 0 ; x < len(links) ; x++ {
+			links[x].dest <- robot{path:input.path, pathLength:links[x].pathLength + input.pathLength}
+		}
 	}
 
 	} ()
