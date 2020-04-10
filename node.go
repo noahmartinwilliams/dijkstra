@@ -20,7 +20,9 @@ func node(retc chan []string, endName string, name string) chan robot {
 			pathLength = bot.pathLength
 		}
 	}
-	retc <- path
+	if name == endName {
+		retc <- path
+	}
 
 	} ()
 	return inputc
