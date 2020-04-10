@@ -14,3 +14,17 @@ func TestBlock2chars(t *testing.T) {
 		t.Errorf("Error: block2chars did not return correct first character.")
 	}
 }
+
+func TestChars2lines(t *testing.T) {
+	inputc := make(chan []byte)
+	retc := chars2lines(block2chars(inputc))
+	inputc <- []byte("hello\nworld\n")
+	ret := <-retc
+	if ret != "hello" {
+		t.Errorf("Error: chars2lines did not return correct first line.")
+	}
+	ret2 := <-retc
+	if ret2 != "world" {
+		t.Errorf("Error: chars2lines did not return correct second line.")
+	}
+}

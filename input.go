@@ -14,3 +14,21 @@ func block2chars(inputc chan []byte) chan byte {
 	} ()
 	return retc
 }
+
+func chars2lines(inputc chan byte) chan string {
+	retc := make(chan string, 100)
+	go func() {
+		defer close(retc)
+		line := ""
+		for input := range(inputc) {
+			if input == '\n' {
+				retc <- line
+				line = ""
+			} else {
+				line = line + string(input)
+			}
+		}
+
+	} ()
+	return retc
+}
