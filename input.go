@@ -1,5 +1,6 @@
 package dijkstra
 
+import "strconv"
 func block2chars(inputc chan []byte) chan byte {
 	retc := make(chan byte, 1024)
 	go func() {
@@ -32,6 +33,37 @@ func chars2lines(inputc chan byte) chan string {
 			retc <-line
 		}
 
+	} ()
+	return retc
+}
+
+func lines2dests(inputc chan string, separator byte) chan dest {
+	retc := make(chan dest, 100)
+	go func() {
+		defer close(retc)
+		for input := range(inputc) {
+			source := ""
+			dest_ := ""
+			pathLengthStr := ""
+			x := 0
+			for ; input[x] != separator && x < len(input) ; x++ {
+				source = source + string(input[x])
+			}
+
+			for x = x + 1 ; input[x] != separator && x < len(input) ; x++ {
+				pathLengthStr = pathLengthStr + string(input[x])
+			}
+
+			for x = x + 1 ; x < len(input) ; x++ {
+				dest_ = dest_ + string(input[x])
+			}
+
+			pathLength, err := strconv.ParseFloat(pathLengthStr, 64)
+			if err != nil {
+				continue
+			}
+			retc <- dest{dest:dest_, source:source, pathLength:pathLength}
+		}
 	} ()
 	return retc
 }

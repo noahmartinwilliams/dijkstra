@@ -31,3 +31,18 @@ func TestChars2lines(t *testing.T) {
 		t.Errorf("Error: chars2lines did not return correct second line.")
 	}
 }
+
+func TestLines2dests(t *testing.T) {
+	inputc := make(chan []byte)
+	retc := lines2dests(chars2lines(block2chars(inputc)), ':')
+	go func() {
+		inputc <-[]byte("a:2:b")
+		close(inputc)
+	} ()
+
+	ret := <-retc
+	if ret.source != "a" {
+		t.Errorf("Error: lines2dests did not return correct source in first test.")
+	}
+
+}
