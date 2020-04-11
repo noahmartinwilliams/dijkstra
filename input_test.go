@@ -18,7 +18,10 @@ func TestBlock2chars(t *testing.T) {
 func TestChars2lines(t *testing.T) {
 	inputc := make(chan []byte)
 	retc := chars2lines(block2chars(inputc))
-	inputc <- []byte("hello\nworld\n")
+	go func() {
+		inputc <- []byte("hello\nworld")
+		close(inputc)
+	} ()
 	ret := <-retc
 	if ret != "hello" {
 		t.Errorf("Error: chars2lines did not return correct first line.")

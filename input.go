@@ -20,13 +20,16 @@ func chars2lines(inputc chan byte) chan string {
 	go func() {
 		defer close(retc)
 		line := ""
-		for input := range(inputc) {
+		for input := range inputc {
 			if input == '\n' {
 				retc <- line
 				line = ""
 			} else {
 				line = line + string(input)
 			}
+		}
+		if line != "" {
+			retc <-line
 		}
 
 	} ()
