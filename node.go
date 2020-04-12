@@ -28,13 +28,19 @@ func node(retc chan []string, endName string, name string) chan robot {
 	return inputc
 }
 
-func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodePool map[string]chan robot) chan robot {
+
+func treeNode(dests2 map[string][]dest, wg *sync.WaitGroup, name string, nodePool map[string]chan robot) chan robot {
 	inputc := make(chan robot)
 	go func() {
 	nodec := nodePool[name]
 
 	defer wg.Done()
 
+	dests := make(map[string][]dest)
+	for key, _ := range(dests2) {
+		dests[key] = make([]dest, len(dests2[key]))
+		copy(dests[key], dests2[key])
+	}
 	destinations, ok := dests[name]
 	if !ok {
 		input := <-inputc
