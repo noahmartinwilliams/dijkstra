@@ -1,4 +1,4 @@
-package dijkstra
+package main
 
 type robot struct {
 	path []string

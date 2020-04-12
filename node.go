@@ -1,4 +1,4 @@
-package dijkstra
+package main
 
 import "sync"
 func node(retc chan []string, endName string, name string) chan robot {
@@ -49,9 +49,7 @@ func treeNode(dests map[string][]dest, wg *sync.WaitGroup, name string, nodePool
 			links = append(links, link{dest:destc, pathLength:destinations[x].pathLength})
 		}
 		input := <-inputc
-		go func() {
-			nodec <- input
-		} ()
+		nodec <- input
 		input.path = append(input.path, name)
 		for x := 0 ; x < len(links) ; x++ {
 			links[x].dest <- robot{path:input.path, pathLength:links[x].pathLength + input.pathLength}

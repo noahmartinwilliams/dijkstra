@@ -1,6 +1,25 @@
-package dijkstra
+package main
 
 import "strconv"
+import "os"
+
+func file2blocks(stdin *os.File) chan []byte {
+	retc := make(chan []byte, 100)
+	buf := make([]byte, 1024)
+	go func() {
+		defer close(retc)
+		size, err := stdin.Read(buf)
+		if err != nil {
+			panic(err)
+		}
+		if size == 0 {
+			return
+		}
+		retc <- buf[0:size-1]
+	} ()
+	return retc
+}
+
 func block2chars(inputc chan []byte) chan byte {
 	retc := make(chan byte, 1024)
 	go func() {
