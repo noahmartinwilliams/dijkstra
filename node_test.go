@@ -1,7 +1,7 @@
 package main
 
 import "testing"
-import "sync"
+//import "sync"
 
 func TestNode(t *testing.T) {
 	retc := make(chan []string)
@@ -20,7 +20,7 @@ func TestNode(t *testing.T) {
 
 }
 
-func TestTreeNode(t *testing.T) {
+/*func TestTreeNode(t *testing.T) {
 	dests := make( map[string][]dest )
 	nodePool := make(map[string]chan robot)
 	var wg sync.WaitGroup
@@ -52,4 +52,4 @@ func TestTreeNode(t *testing.T) {
 	if node.path[2] != "e" {
 		t.Errorf("Error: treeNode did not launch subTree.")
 	}
-}
+} */

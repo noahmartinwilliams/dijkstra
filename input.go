@@ -2,6 +2,7 @@ package main
 
 import "strconv"
 import "os"
+import "sync"
 
 func file2blocks(stdin *os.File) chan []byte {
 	retc := make(chan []byte, 100)
@@ -79,10 +80,67 @@ func lines2dests(inputc chan string, separator byte) chan dest {
 
 			pathLength, err := strconv.ParseFloat(pathLengthStr, 64)
 			if err != nil {
-				continue
+				panic(err.Error())
 			}
 			retc <- dest{dest:dest_, source:source, pathLength:pathLength}
 		}
+	} ()
+	return retc
+}
+
+func matLine2line(wg *sync.WaitGroup, line string, separator byte, current_line int, outc chan string) {
+	retc := make(chan string, 100)
+	go func() {
+		defer close(retc)
+		num := ""
+		for x := 0 ; x < len(line) ; x ++ {
+			if line[x] == separator {
+				retc <- num
+				num = ""
+			} else {
+				num = num + string(line[x])
+			}
+		}
+		retc <- num
+	} ()
+
+	go func() {
+	defer wg.Done()
+
+	start := "s"
+	current_line_str := strconv.Itoa(current_line)
+	if separator == 's' {
+		start = "g"
+	}
+
+	x := 0
+	for input := range(retc) {
+		x_str := strconv.Itoa(x)
+		if x_str != current_line_str {
+			outc <- (start + current_line_str + string(separator) + input + string(separator) + start + x_str)
+		}
+		x = x + 1
+	}
+
+
+	} ()
+}
+
+func matLines2lines(inputc chan string, separator byte) chan string {
+	retc := make(chan string, 1000)
+	var wg sync.WaitGroup
+	go func() {
+	x := 0
+	for input := range(inputc) {
+		wg.Add(1)
+		matLine2line(&wg, input, separator, x, retc)
+		wg.Wait()
+		x = x + 1
+	}
+	go func() {
+		defer close(retc)
+		wg.Wait()
+	} ()
 	} ()
 	return retc
 }
